@@ -7,6 +7,11 @@ public class PlayerController2D : MonoBehaviour
     public float acceleration = 10f;
     public float deceleration = 15f;
 
+    [Header("造型設定 (放入左右兩面的圖片)")]
+    public SpriteRenderer spriteRenderer; // 負責顯示圖片的組件
+    public Sprite rightFacingSprite;      // 向右走時的造型
+    public Sprite leftFacingSprite;       // 向左走時的造型
+
     private Rigidbody2D rb;
     private float targetSpeed;
     private float currentSpeed;
@@ -15,6 +20,12 @@ public class PlayerController2D : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        // 如果沒有手動拖入 SpriteRenderer，程式會自動抓取同一物件上的
+        if (spriteRenderer == null)
+        {
+            spriteRenderer = GetComponent<SpriteRenderer>();
+        }
     }
 
     void Update()
@@ -42,10 +53,18 @@ public class PlayerController2D : MonoBehaviour
 
         targetSpeed = moveInput * moveSpeed;
 
-        // 角色翻面
-        if (moveInput != 0)
+        // --- 【修改重點：根據移動方向替換造型】 ---
+        if (moveInput > 0)
         {
-            transform.localScale = new Vector3(Mathf.Sign(moveInput), 1, 1);
+            // 往右走，換成右邊的造型，並確保沒有被鏡像翻轉
+            spriteRenderer.sprite = rightFacingSprite;
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+        else if (moveInput < 0)
+        {
+            // 往左走，換成左邊的造型，並確保沒有被鏡像翻轉
+            spriteRenderer.sprite = leftFacingSprite;
+            transform.localScale = new Vector3(1, 1, 1);
         }
     }
 
